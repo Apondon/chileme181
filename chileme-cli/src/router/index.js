@@ -41,6 +41,12 @@ Vue.use(VueRouter)
     name: 'Login',
     component: () => import( '../views/Login.vue')
   },
+  // testApi
+  {
+    path: '/testApi',
+    name: 'testApi',
+    component: () => import( '../views/testApi.vue')
+  },
 ]
 
 const router = new VueRouter({

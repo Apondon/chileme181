@@ -17,4 +17,4 @@ const Carts = new schema({
     goodsprice : Number
 })
 
-module.exports =  mongoose.Model('Carts',Carts)
+module.exports =  mongoose.model('Carts',Carts)
