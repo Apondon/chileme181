@@ -5,7 +5,7 @@
         <hr><hr>
         <div v-for='item in api' :key='item.id' @click='sendRequest(item.url,item.method)'>{{`url: ${item.url} method: ${item.method}`}}</div>
     </div>
-</template>
+</template>                            下3
 
 <script>
 export default {
@@ -29,10 +29,10 @@ export default {
                 url:'/api/carts/getCartsList' //接口地址
             }).then(res => { //请求成功的回调
                 console.log(res)
+                this.fn3()
             }).catch(err => { //请求失败的回调
                 console.log(err)
             })
-
         },
         sendRequest(url,method){
             console.log(
@@ -47,6 +47,9 @@ export default {
             }).catch(err => { //请求失败的回调
                 console.log(err)
             })
+        },
+        fn3(){
+            alert(this.str)
         }
     }
 }
