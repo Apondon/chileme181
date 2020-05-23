@@ -22,7 +22,10 @@ const getCartsList = async ctx => {
 
 // 添加商品
 const addToCart = async ctx => {
-    ctx.body =  '添加商品'
+    let qingqiushuju = ctx.request.body
+    console.log(qingqiushuju)
+
+    ctx.body =  qingqiushuju.name
 }
 // 删除商品
 const deleCartItem = async ctx =>{

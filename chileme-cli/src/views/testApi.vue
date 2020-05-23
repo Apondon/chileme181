@@ -41,7 +41,11 @@ export default {
             )
             this.Axios({
                 method:method,//请求方式
-                url:url //接口地址
+                url:url, //接口地址
+                data:{
+                    name:'张三',
+                    age:18
+                }, //请求参数
             }).then(res => { //请求成功的回调
                 console.log(res)
             }).catch(err => { //请求失败的回调
