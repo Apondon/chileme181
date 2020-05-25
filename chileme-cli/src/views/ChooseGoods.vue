@@ -146,17 +146,18 @@ export default {
     },
     methods:{
         clickHandle(obj){
-            let flag = false
-            for(let i=0;i<this.list.length;i++){
-                if(obj.id === this.list[i].id){
-                    flag = true  //当点击的数据在数组中存在，将flag置为true
-                    break
+            this.Axios({
+                method:'POST',
+                url:'/api/carts/addToCart',
+                data:{
+                    // goodId:obj.id
+                    goodId:1588037104748
                 }
-            }
-            if(!flag){
-                this.list.push(obj)
-            }
-            console.log(this.list)
+            }).then(res => {
+                console.log(res)
+            }).catch(err => {
+                console.log(err)
+            })
         },
         deleteHandle(row){
             for(let i=0;i<this.list.length;i++){
