@@ -54,7 +54,7 @@ const addToCart = async ctx => {
             mobile:133344445566,
             user:'张三',
             goodId:flag.goodId,
-            goodsname:flag.goodname,
+            goodname:flag.goodname,
             price:flag.price
         })
         console.log(flag)
@@ -76,7 +76,25 @@ const addToCart = async ctx => {
 }
 // 删除商品
 const deleCartItem = async ctx =>{
-    ctx.body =  '删除商品'
+    let arg = ctx.request.body
+    console.log(arg)
+    await Carts.deleteOne({
+        goodId:arg.goodId
+    })
+    .then(res => {
+        ctx.body = {
+            success:true,
+            msg:'删除成功'
+        }
+    })
+    .catch(err => {
+        console.log(err)
+        ctx.body = {
+            success:false,
+            msg:'删除失败'
+        }
+    })
+    
 }
 
 module.exports ={
