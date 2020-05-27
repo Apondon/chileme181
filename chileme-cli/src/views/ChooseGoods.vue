@@ -13,7 +13,8 @@
                                     el-table-column(fixed="right",label="操作",width="100")
                                         template(slot-scope="scope")
                                             el-button(type="text",size="small",@click='deleteHandle(scope.row)') 删除
-                            div {{`总价: ${totalPrice}`}}
+                            div {{`computed 总价: ${totalPrice}`}}
+                            div {{`watch 总价 ${totalPriceWatch}`}}
                         el-tab-pane(label="订单")
                             div 
                                 el-table(:data='orderList',style="width: 100%",border)
@@ -28,58 +29,58 @@
                     div.suggestFood
                         h4 推荐菜
                         div.foodsbox
-                            div.foodItem(v-for='item in foodsbox',:key='item.id',@click='clickHandle(item)') {{item.name}}
+                            div.foodItem(v-for='item in foodsbox',:key='item.goodId',@click='clickHandle(item)') {{item.goodname}}
                                 span {{`￥${item.price}`}}
                         div.foodstab
                             el-tabs(type="border-card")
                                 el-tab-pane(label="热菜")
                                     div.hotbox
-                                        div.foodsCard(v-for='item in hotList',:key='item.id')
+                                        div.foodsCard(v-for='item in hotList',:key='item.goodId')
                                             el-row
                                                 el-col(:span="8")
                                                     div.cardimg
                                                 el-col(:span="16")
                                                     div.cardinfo
-                                                        div.foodname {{item.name}}
+                                                        div.foodname {{item.goodname}}
                                                         div.foodmart {{`材料: ${item.material.join(',')}`}}
                                                         div.foodrank 
-                                                            el-rate(v-model="item.rank",disabled)
+                                                            el-rate(v-model="item.rate",disabled)
                                                         div.foodprice {{`价格: ${item.price}`}}
                                                         el-button(@click='clickHandle(item)') 下单
                                 el-tab-pane(label="凉菜") 
                                     div.coldbox
-                                        div.foodsCard(v-for='item in coldList',:key='item.id')
+                                        div.foodsCard(v-for='item in coldList',:key='item.goodId')
                                             el-row
                                                 el-col(:span="8")
                                                     div.cardimg
                                                 el-col(:span="16")
                                                     div.cardinfo
-                                                        div.foodname {{item.name}}
+                                                        div.foodname {{item.goodname}}
                                                         div.foodmart {{`材料: ${item.material.join(',')}`}}
                                                         div.foodrank 
-                                                            el-rate(v-model="item.rank",disabled)
+                                                            el-rate(v-model="item.rate",disabled)
                                                         div.foodprice {{`价格: ${item.price}`}}
                                                         el-button(@click='clickHandle(item)') 下单
                                 el-tab-pane(label="主食")
                                     div.ricebox
-                                        div.foodsCard(v-for='item in riceList',:key='item.id')
+                                        div.foodsCard(v-for='item in riceList',:key='item.goodId')
                                             el-row
                                                 el-col(:span="8")
                                                     div.cardimg
                                                 el-col(:span="16")
                                                     div.cardinfo
-                                                        div.foodname {{item.name}}
+                                                        div.foodname {{item.goodname}}
                                                         div.foodprice {{`价格: ${item.price}`}}
                                                         el-button(@click='clickHandle(item)') 下单
                                 el-tab-pane(label="饮料")
                                     div.drinkbox
-                                        div.foodsCard(v-for='item in drinkList',:key='item.id')
+                                        div.foodsCard(v-for='item in drinkList',:key='item.goodId')
                                             el-row
                                                 el-col(:span="8")
                                                     div.cardimg
                                                 el-col(:span="16")
                                                     div.cardinfo
-                                                        div.foodname {{item.name}}
+                                                        div.foodname {{item.goodname}}
                                                         div.foodprice {{`价格: ${item.price}`}}
                                                         el-button(@click='clickHandle(item)') 下单
 </template>
@@ -99,7 +100,8 @@ export default {
                 {id:2,orderNo:'ODR123457',date:'2020-01-12 12:00:00',user:'user2',phone:13333333337},
                 {id:3,orderNo:'ODR123458',date:'2020-01-14 12:00:00',user:'user4',phone:13333333336},
                 {id:4,orderNo:'ODR123459',date:'2020-02-16 13:00:00',user:'user5',phone:13333333335},
-            ]
+            ],
+            totalPriceWatch:0,
 
         }
     },
@@ -114,8 +116,7 @@ export default {
                 method:'POST',
                 url:'/api/carts/addToCart',
                 data:{
-                    // goodId:obj.id
-                    goodId:1588037104748
+                    goodId:obj.goodId
                 }
             }).then(res => {
                 console.log(res)
@@ -160,8 +161,8 @@ export default {
                     if(data.data.data[i].rate >3) this.foodsbox.push(data.data.data[i])
                     // itemType 为cool的放在凉菜分类
                     if(data.data.data[i].itemType == 'cool') this.coldList.push(data.data.data[i])
-                    // itemType 为hot的放在热菜分类
-                    if(data.data.data[i].itemType == 'hot') this.hotList.push(data.data.data[i])
+                    // itemType 为special的放在热菜分类
+                    if(data.data.data[i].itemType == 'special') this.hotList.push(data.data.data[i])
                     // itemType 为drink的放在饮料分类
                     if(data.data.data[i].itemType == 'drink') this.drinkList.push(data.data.data[i])
                     // itemType 为normal的放在主食分类
@@ -257,11 +258,20 @@ export default {
     },
     computed:{
         totalPrice(){
-            let price = 0; // 初始订单总价
-            for(let i=0;i<this.list.length;i++){ //将购物车中所有的商品进行遍历
-                price += Number(this.list[i].price) //对每件商品单价进行累加
+            let count = 0
+            // 获取购物车数据并进行遍历
+            for(let i=0;i<this.list.length;i++){
+                count += Number(this.list[i].price)
             }
-            return price //将计算后的商品总价返回出去
+            return count
+        }
+    },
+    watch:{
+        "list":function(newVal,oldVal){
+            this.totalPriceWatch = 0
+            for(let i=0;i<newVal.length;i++){
+                this.totalPriceWatch += Number(newVal[i].price)
+            }
         }
     }
 }
