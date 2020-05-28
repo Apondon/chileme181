@@ -15,6 +15,7 @@
                                             el-button(type="text",size="small",@click='deleteHandle(scope.row)') 删除
                             div {{`computed 总价: ${totalPrice}`}}
                             div {{`watch 总价 ${totalPriceWatch}`}}
+                            el-button(type="primary",@click='addOrder') 下单
                         el-tab-pane(label="订单")
                             div 
                                 el-table(:data='orderList',style="width: 100%",border)
@@ -111,6 +112,7 @@ export default {
         this.getOrders() //请求订单数据
     },
     methods:{
+        // 向购物车中添加商品
         clickHandle(obj){
             this.Axios({
                 method:'POST',
@@ -125,6 +127,7 @@ export default {
                 console.log(err)
             })
         },
+        // 从购物车中删除商品
         deleteHandle(row){
             this.Axios({
                 method:'POST',
@@ -198,45 +201,28 @@ export default {
             }).catch(err => { // 请求失败的处理
                 console.log(err)
             })
-        },
-        // 向购物车中添加商品
-        addGoods(){
-            this.Axios({
-                method:'', // 请求方式
-                url:'',  // 接口地址
-                data:{  // 发送给后台的数据
-                    
-                }
-            }).then(data => { // 请求成功的处理
-
-            }).catch(err => { // 请求失败的处理
-                console.log(err)
-            })
-        },
-        // 从购物车中删除商品
-        deleGoods(){
-            this.Axios({
-                method:'', // 请求方式
-                url:'',  // 接口地址
-                data:{  // 发送给后台的数据
-                    
-                }
-            }).then(data => { // 请求成功的处理
-
-            }).catch(err => { // 请求失败的处理
-                console.log(err)
-            })
-        },          
+        },     
         // 添加订单数据
         addOrder(){
+            // 13456789874
+            // 123456
+            // 获取购物车中的菜品数据
+            let arr = [] //定义一个空数组来存放购物车中的菜品id
+            // 遍历购物扯数组 i是数组中元素的下标 从0开始到 数组.length-1结束
+            for(let i=0;i<this.list.length;i++){
+                // 将购物车中每件商品的id放入arr中
+                arr.push(this.list[i].goodId) 
+            }
+            console.log(arr)
             this.Axios({
-                method:'', // 请求方式
-                url:'',  // 接口地址
+                method:'POST', // 请求方式
+                url:'/api/order/addOrder',  // 接口地址
                 data:{  // 发送给后台的数据
-                    
-                }
+                    idList:arr
+                },
+                widthCredential:true,//允许该请求携带证书（cookie/session）
             }).then(data => { // 请求成功的处理
-
+                console.log('下单')
             }).catch(err => { // 请求失败的处理
                 console.log(err)
             })
