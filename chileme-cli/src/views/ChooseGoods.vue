@@ -20,8 +20,8 @@
                             div 
                                 el-table(:data='orderList',style="width: 100%",border)
                                     el-table-column(prop="orderNo",label="订单号")
-                                    el-table-column(prop="date",label="创建时间")
-                                    el-table-column(prop="user",label="创建人")
+                                    el-table-column(prop="createTime",label="创建时间")
+                                    el-table-column(prop="createPerson",label="创建人")
                                     el-table-column(fixed="right",label="操作",width="70")
                                         template(slot-scope="scope")
                                             el-button(type="text",size="small",@click='deleteOrderHandle(scope.row)') 删除
@@ -96,12 +96,7 @@ export default {
             coldList:[], // 凉菜
             riceList:[], //主食
             drinkList:[],// 饮料
-            orderList:[
-                {id:1,orderNo:'ODR123456',date:'2020-01-11 12:00:00',user:'user1',phone:13333333334},
-                {id:2,orderNo:'ODR123457',date:'2020-01-12 12:00:00',user:'user2',phone:13333333337},
-                {id:3,orderNo:'ODR123458',date:'2020-01-14 12:00:00',user:'user4',phone:13333333336},
-                {id:4,orderNo:'ODR123459',date:'2020-02-16 13:00:00',user:'user5',phone:13333333335},
-            ],
+            orderList:[],
             totalPriceWatch:0,
 
         }
@@ -141,14 +136,7 @@ export default {
 
             })
         },
-        deleteOrderHandle(row){
-            for(let i=0;i<this.orderList.length;i++){
-                if(this.orderList[i].id === row.id){
-                    this.orderList.splice(i,1)
-                    break;
-                }
-            }
-        },
+       
         //请求菜单数据
         getFoods(){
             this.Axios({
@@ -191,13 +179,12 @@ export default {
         // 请求订单数据
         getOrders(){
             this.Axios({
-                method:'', // 请求方式
-                url:'',  // 接口地址
-                data:{  // 发送给后台的数据
-                    
-                }
+                method:'GET', // 请求方式
+                url:'/api/order/queryOrderList',  // 接口地址
+                
             }).then(data => { // 请求成功的处理
-
+                console.log(data)
+                this.orderList = data.data.list
             }).catch(err => { // 请求失败的处理
                 console.log(err)
             })
@@ -223,20 +210,22 @@ export default {
                 widthCredential:true,//允许该请求携带证书（cookie/session）
             }).then(data => { // 请求成功的处理
                 console.log('下单')
+                this.getOrders()
+                this.getCarts()
             }).catch(err => { // 请求失败的处理
                 console.log(err)
             })
         },
         // 删除订单数据
-        deleOrder(){
+        deleteOrderHandle(row){
             this.Axios({
-                method:'', // 请求方式
-                url:'',  // 接口地址
+                method:'POST', // 请求方式
+                url:'/api/order/deleOrder',  // 接口地址
                 data:{  // 发送给后台的数据
-                    
+                    orderNo:row.orderNo
                 }
             }).then(data => { // 请求成功的处理
-
+                this.getOrders()
             }).catch(err => { // 请求失败的处理
                 console.log(err)
             })

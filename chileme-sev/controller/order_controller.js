@@ -3,6 +3,7 @@
 const Order = require('../model/order_schema')  // 引入订单的schema文件
 const User = require('../model/user_schema')
 const Goods = require('../model/goods_schema')
+const Carts = require('../model/carts_schema')
 // 查询订单列表
 
 const queryOrderList = async ctx => {
@@ -95,17 +96,25 @@ const addOrder = async function(ctx){
 
     // 将创建的数据插入数据库
     await orderItem.save().then(res=>{
-        ctx.response.body={
-            success:true,
-            msg:'创建成功'
-        }
+        console.log(res)
     }).catch(err => {
         ctx.response.body={
             success:false,
             msg:'创建失败'
         }
     })
-
+    // 将购物车中的商品清空
+    await Carts.deleteMany().then(res => {
+         ctx.response.body={
+            success:true,
+            msg:'操作成功'
+        }
+    }).catch(err => {
+        ctx.response.body={
+            success:false,
+            msg:'操作失败'
+        }
+    })
     // 从客户端获取cookie
     // let ck = ctx.cookies.get('user')
     // 在客户端设置cookie
@@ -114,7 +123,20 @@ const addOrder = async function(ctx){
 
 // 删除订单
 const deleOrder = async ctx => {
-    ctx.response.body = '删除订单'
+    let req = ctx.request.body
+    await Order.deleteOne({orderNo:req.orderNo}).then(res => {
+        ctx.response.body = {
+            success:true,
+            msg:'操作成功'
+        }
+    }).catch(err => {
+        console.log(err)
+        ctx.response.body = {
+            success:false,
+            msg:'操作失败'
+        }
+    })
+     
 }
 
 module.exports = {
